@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class PackManager : MonoBehaviour{
 
@@ -81,8 +82,16 @@ public class PackManager : MonoBehaviour{
     /// <summary>
     /// 数据加载
     /// </summary>
-    /// <param name="level"></param>
     private void Load()
+    {
+        StartCoroutine(LoadAssetBundel());
+        LoadItemData();
+    }
+
+    /// <summary>
+    /// 装备数据加载
+    /// </summary>
+    public void LoadItemData()
     {
         string path_w1 = "ItemImage/INV_2H_Auchindoun_01";
         Weapon w1 = new Weapon(ItemType.Weapon, 1, "萨德的弯刀", 300, 180, "萨德使用过的弯刀", path_w1, 20, 0);
@@ -117,6 +126,15 @@ public class PackManager : MonoBehaviour{
         ItemList.Add(a3.ID, a3);
         ItemList.Add(c1.ID, c1);
         ItemList.Add(c2.ID, c2);
+    }
+
+    /// <summary>
+    /// 加载资源包
+    /// </summary>
+    public IEnumerator LoadAssetBundel()
+    {
+        UnityWebRequest webRequest = UnityWebRequest.GetAssetBundle("");
+        yield return webRequest.SendWebRequest();
     }
 
 

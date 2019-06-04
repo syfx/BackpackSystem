@@ -1,0 +1,7 @@
+function start
+	print("start")
+end
+
+function update
+	print([[update]])
+end
