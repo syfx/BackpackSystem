@@ -33,7 +33,7 @@ public class PackManager : MonoBehaviour{
         _Instance = this;
         luaEnv = new LuaEnv();
 
-        Load();
+        Load("PackManager.lua", "luasprite.v1");
         GridUI.OnEnter += GridUI_OnEnter;
         GridUI.OnExit += GridUI_OnExit;
         GridUI.OnLeftBeginDrag += GridUI_OnLeftBeginDrag;
@@ -88,10 +88,10 @@ public class PackManager : MonoBehaviour{
     /// <summary>
     /// 数据加载
     /// </summary>
-    private void Load()
+    private void Load(string resName, string resPath)
     {
         //从服务器加载PackManager.lua脚本
-        StartCoroutine(LoadAssetBundel("PackManager.lua", "luasprite.v1"));
+        StartCoroutine(LoadAssetBundel(resName, resPath));
         LoadItemData();
     }
 
@@ -136,19 +136,14 @@ public class PackManager : MonoBehaviour{
     }
 
     /// <summary>
-    /// 加载资源包
+    /// 加载lua资源包
     /// </summary>
     public IEnumerator LoadAssetBundel(string resName, string resPath)
     {
-        
-        UnityWebRequest request = UnityWebRequest.GetAssetBundle(@"https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
+        UnityWebRequest request = UnityWebRequest.GetAssetBundle("https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
         yield return request.SendWebRequest();
-        print("请求成功");
         AssetBundle ab = (request.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
         TextAsset luaText = ab.LoadAsset<TextAsset>(resName);
-        print(textAsset.text);
-        print(luaText.text);
-        luaEnv.DoString(luaText.text);
     }
 
 
