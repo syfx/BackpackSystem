@@ -5,10 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using XLua;
+using System.IO;
 
+[LuaCallCSharp]
 public class PackManager : MonoBehaviour{
-
-    public TextAsset textAsset;
 
     private static PackManager _Instance;
     public static PackManager Instance { get { return _Instance; } }
@@ -25,13 +25,31 @@ public class PackManager : MonoBehaviour{
     public PackPanel ThePack;
     [Tooltip("添加装备按钮")]
     public Button AddItem;
+    [Tooltip("Lua脚本文件")]
+    public TextAsset luaScriptFile;
 
-    LuaEnv luaEnv;
+    private LuaEnv luaEnv;
+    /// <summary>
+    /// 当前脚本的lua环境
+    /// </summary>
+    private LuaTable scriptEnv;
+    private string luaText = string.Empty;
+    private bool isFirstLoad = true;
 
     private void Awake()
     {
         _Instance = this;
+        //lua虚拟机
         luaEnv = new LuaEnv();
+        scriptEnv = luaEnv.NewTable();
+        LuaTable metaTable = luaEnv.NewTable();
+
+        //将lua全局环境当做表metaTable的元方法
+        metaTable.Set("__index", luaEnv.Global);
+        //将表metaTable设为scriptEnv的元表
+        scriptEnv.SetMetaTable(metaTable);
+
+        
 
         Load("PackManager.lua", "luasprite.v1");
         GridUI.OnEnter += GridUI_OnEnter;
@@ -43,14 +61,29 @@ public class PackManager : MonoBehaviour{
 
     private void Update()
     {
+        if(isFirstLoad)
+        {
+            if(luaText != string.Empty)
+            {
+                //执行上次热更后的版本
+                luaEnv.DoString(luaText, "PackManager.Lua", scriptEnv);
+            }
+            else
+            {
+                //执行打包时的Lua脚本
+                luaEnv.DoString(luaScriptFile.text, "PackManager.Lua", scriptEnv);
+            }
+            isFirstLoad = false;
+        }
+
         Vector2 position;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             GameObject.Find("Canvas").transform as RectTransform,
             Input.mousePosition, null, out position);
         if (IsDrag)
         {
-            //显示提示框
-            DragItem.ShowToolTip();
+            //显示拖拽UI
+            DragItem.ShowDrag();
             DragItem.SetPosition(position);
         }
         else if (IsShowTooltip)
@@ -91,7 +124,8 @@ public class PackManager : MonoBehaviour{
     private void Load(string resName, string resPath)
     {
         //从服务器加载PackManager.lua脚本
-        StartCoroutine(LoadAssetBundel(resName, resPath));
+        StartCoroutine(UpdateLuaScript(resName, resPath, "luaText.txt"));
+        LoadLuaScript("luaText.txt");
         LoadItemData();
     }
 
@@ -136,14 +170,58 @@ public class PackManager : MonoBehaviour{
     }
 
     /// <summary>
-    /// 加载lua资源包
+    /// 从服务器获取Lua脚本并更新本地Lua脚本
     /// </summary>
-    public IEnumerator LoadAssetBundel(string resName, string resPath)
+    public IEnumerator UpdateLuaScript(string resName, string resPath, string localPath)
     {
         UnityWebRequest request = UnityWebRequest.GetAssetBundle("https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
         yield return request.SendWebRequest();
         AssetBundle ab = (request.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
-        TextAsset luaText = ab.LoadAsset<TextAsset>(resName);
+        luaScriptFile = ab.LoadAsset<TextAsset>(resName);
+        if(luaScriptFile != null)
+        {
+            Debug.Log("更新后重启程序");
+            try
+            {
+                StreamWriter sw;
+                //如果不存在则创建一个lua脚本文件
+                if (!File.Exists(Application.persistentDataPath + @"\" + localPath))
+                {
+                    sw = File.CreateText(Application.persistentDataPath + @"\" + localPath);
+                }
+                else
+                {
+                    sw = File.AppendText(Application.persistentDataPath + @"\" + localPath);
+                }
+                sw.WriteLine(luaScriptFile.text);
+                //关闭并销毁流
+                sw.Close();
+                sw.Dispose();
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log(e.Message);
+            }
+        }
+    }
+    /// <summary>
+    /// 从本地加载lua脚本
+    /// </summary>
+    /// <param name="resName">文件在Application.persistentDataPath下的路径，不包括扩展名</param>
+    public void LoadLuaScript(string localPath)
+    {
+        try
+        {
+            if(File.Exists(Application.persistentDataPath + @"\" + localPath))
+            {
+                luaText = File.ReadAllText(Application.persistentDataPath + @"\" + localPath);
+                print("luaText: " + luaText);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log(e.Message);
+        }
     }
 
 
@@ -204,7 +282,7 @@ public class PackManager : MonoBehaviour{
                 CreateItem(item, arg1);
         }
         IsDrag = false;
-        DragItem.HideToolTip();
+        DragItem.HideDrag();
     }
     #endregion
     /// <summary>

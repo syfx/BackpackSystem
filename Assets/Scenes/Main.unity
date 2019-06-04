@@ -569,11 +569,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bab99711d7cbd88498758a7227dcc5cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textAsset: {fileID: 4900000, guid: f1d7052766128c54a92238f24509be7e, type: 3}
   tooltip: {fileID: 1477397576}
   DragItem: {fileID: 1794967697}
   ThePack: {fileID: 1040475549}
   AddItem: {fileID: 622893909}
+  luaScriptFile: {fileID: 4900000, guid: f1d7052766128c54a92238f24509be7e, type: 3}
 --- !u!1001 &206835927
 Prefab:
   m_ObjectHideFlags: 0

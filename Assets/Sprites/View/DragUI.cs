@@ -5,9 +5,9 @@ using UnityEngine;
 public class DragUI : ItemUI {
 
     /// <summary>
-    /// 显示提示框
+    /// 显示若拽UI
     /// </summary>
-    public void ShowToolTip()
+    public void ShowDrag()
     {
         gameObject.SetActive(true);
     }
@@ -15,7 +15,7 @@ public class DragUI : ItemUI {
     /// <summary>
     /// 隐藏提示框
     /// </summary>
-    public void HideToolTip()
+    public void HideDrag()
     {
         gameObject.SetActive(false);
     }
