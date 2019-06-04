@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using XLua;
 
 public class PackManager : MonoBehaviour{
+
+    public TextAsset textAsset;
 
     private static PackManager _Instance;
     public static PackManager Instance { get { return _Instance; } }
@@ -24,9 +26,13 @@ public class PackManager : MonoBehaviour{
     [Tooltip("添加装备按钮")]
     public Button AddItem;
 
+    LuaEnv luaEnv;
+
     private void Awake()
     {
         _Instance = this;
+        luaEnv = new LuaEnv();
+
         Load();
         GridUI.OnEnter += GridUI_OnEnter;
         GridUI.OnExit += GridUI_OnExit;
@@ -84,7 +90,8 @@ public class PackManager : MonoBehaviour{
     /// </summary>
     private void Load()
     {
-        StartCoroutine(LoadAssetBundel());
+        //从服务器加载PackManager.lua脚本
+        StartCoroutine(LoadAssetBundel("PackManager.lua", "luasprite.v1"));
         LoadItemData();
     }
 
@@ -131,10 +138,17 @@ public class PackManager : MonoBehaviour{
     /// <summary>
     /// 加载资源包
     /// </summary>
-    public IEnumerator LoadAssetBundel()
+    public IEnumerator LoadAssetBundel(string resName, string resPath)
     {
-        UnityWebRequest webRequest = UnityWebRequest.GetAssetBundle("");
-        yield return webRequest.SendWebRequest();
+        
+        UnityWebRequest request = UnityWebRequest.GetAssetBundle(@"https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
+        yield return request.SendWebRequest();
+        print("请求成功");
+        AssetBundle ab = (request.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
+        TextAsset luaText = ab.LoadAsset<TextAsset>(resName);
+        print(textAsset.text);
+        print(luaText.text);
+        luaEnv.DoString(luaText.text);
     }
 
 
