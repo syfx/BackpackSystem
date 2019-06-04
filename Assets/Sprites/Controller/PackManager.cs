@@ -177,7 +177,10 @@ public class PackManager : MonoBehaviour{
         UnityWebRequest request = UnityWebRequest.GetAssetBundle("https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
         yield return request.SendWebRequest();
         AssetBundle ab = (request.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
-        luaScriptFile = ab.LoadAsset<TextAsset>(resName);
+        if(ab != null)
+        {
+            luaScriptFile = ab.LoadAsset<TextAsset>(resName);
+        }
         if(luaScriptFile != null)
         {
             Debug.Log("更新后重启程序");
