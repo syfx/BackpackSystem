@@ -1,2 +1,3 @@
-print("old")
+print("update")
+private([[script is new]])
 

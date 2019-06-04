@@ -191,9 +191,10 @@ public class PackManager : MonoBehaviour{
                 }
                 else
                 {
-                    sw = File.AppendText(Application.persistentDataPath + @"\" + localPath);
-                    sw.Flush();         //清空原有内容
+                    //清空之前内容
+                    sw = new StreamWriter(Application.persistentDataPath + @"\" + localPath, false); 
                 }
+                //写入内容
                 sw.WriteLine(luaScriptFile.text);
                 //关闭并销毁流
                 sw.Close();
@@ -216,7 +217,6 @@ public class PackManager : MonoBehaviour{
             if(File.Exists(Application.persistentDataPath + @"\" + localPath))
             {
                 luaText = File.ReadAllText(Application.persistentDataPath + @"\" + localPath);
-                print("luaText: " + luaText);
             }
         }
         catch (System.Exception e)
