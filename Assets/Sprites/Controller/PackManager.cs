@@ -192,6 +192,7 @@ public class PackManager : MonoBehaviour{
                 else
                 {
                     sw = File.AppendText(Application.persistentDataPath + @"\" + localPath);
+                    sw.Flush();         //清空原有内容
                 }
                 sw.WriteLine(luaScriptFile.text);
                 //关闭并销毁流
