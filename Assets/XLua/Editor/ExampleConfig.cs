@@ -244,6 +244,14 @@ public static class ExampleConfig
     //}
     //--------------end 热补丁自动化配置-------------------------
 
+    //静态列表
+    //[LuaCallCSharp]
+    //public static List<Type> mymodule_lua_call_cs_list = new List<Type>()
+    //{
+    //    typeof(System.Text.StringBuilder),
+    //    typeof(UnityEngine.GameObject),
+    //};
+
     //黑名单
     [BlackList]
     public static List<List<string>> BlackList = new List<List<string>>()  {

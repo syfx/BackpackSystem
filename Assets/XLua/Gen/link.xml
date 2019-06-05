@@ -3,7 +3,14 @@
 <linker>
 
 	<assembly fullname="Assembly-CSharp">
-	    <type fullname="PackManager" preserve="all"/>
+	    <type fullname="PackSystem.MyRectTransformUtility" preserve="all"/>
+		<type fullname="PackSystem.PackManager" preserve="all"/>
+		<type fullname="PackSystem.Item" preserve="all"/>
+		<type fullname="PackSystem.ItemModel" preserve="all"/>
+		<type fullname="PackSystem.DragUI" preserve="all"/>
+		<type fullname="PackSystem.GridUI" preserve="all"/>
+		<type fullname="PackSystem.PackPanel" preserve="all"/>
+		<type fullname="PackSystem.Tooltip" preserve="all"/>
 		
 	</assembly>
 

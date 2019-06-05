@@ -569,6 +569,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bab99711d7cbd88498758a7227dcc5cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  injections:
+  - name: objTooltip
+    value: {fileID: 1477397573}
+  - name: objDragUI
+    value: {fileID: 1794967695}
+  - name: objPackPanel
+    value: {fileID: 1040475544}
+  - name: objAddItem
+    value: {fileID: 622893907}
   tooltip: {fileID: 1477397576}
   DragItem: {fileID: 1794967697}
   ThePack: {fileID: 1040475549}
@@ -2634,7 +2643,7 @@ RectTransform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1040475544}
-  m_LocalRotation: {x: -0, y: -0, z: 0.007260412, w: 0.9999737}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2660,7 +2669,7 @@ RectTransform:
   - {fileID: 405038825}
   m_Father: {fileID: 503638030}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.832}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.27125, y: 0.69100004}
   m_AnchorMax: {x: 0.27125, y: 0.69100004}
   m_AnchoredPosition: {x: -19, y: -44}

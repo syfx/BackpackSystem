@@ -15,28 +15,32 @@ using System.Collections.Generic;
 namespace XLua.CSObjectWrap
 {
     using Utils = XLua.Utils;
-    public class PackManagerWrap 
+    public class PackSystemPackManagerWrap 
     {
         public static void __Register(RealStatePtr L)
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			System.Type type = typeof(PackManager);
-			Utils.BeginObjectRegister(type, L, translator, 0, 5, 5, 5);
+			System.Type type = typeof(PackSystem.PackManager);
+			Utils.BeginObjectRegister(type, L, translator, 0, 7, 6, 6);
 			
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Start", _m_Start);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "StoreItem", _m_StoreItem);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "RemoveItem", _m_RemoveItem);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "LoadItemData", _m_LoadItemData);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "UpdateLuaScript", _m_UpdateLuaScript);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "LoadLuaScript", _m_LoadLuaScript);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "OnDisable", _m_OnDisable);
 			
 			
-			Utils.RegisterFunc(L, Utils.GETTER_IDX, "tooltip", _g_get_tooltip);
+			Utils.RegisterFunc(L, Utils.GETTER_IDX, "injections", _g_get_injections);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "tooltip", _g_get_tooltip);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "DragItem", _g_get_DragItem);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "ThePack", _g_get_ThePack);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "AddItem", _g_get_AddItem);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "luaScriptFile", _g_get_luaScriptFile);
             
-			Utils.RegisterFunc(L, Utils.SETTER_IDX, "tooltip", _s_set_tooltip);
+			Utils.RegisterFunc(L, Utils.SETTER_IDX, "injections", _s_set_injections);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "tooltip", _s_set_tooltip);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "DragItem", _s_set_DragItem);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "ThePack", _s_set_ThePack);
             Utils.RegisterFunc(L, Utils.SETTER_IDX, "AddItem", _s_set_AddItem);
@@ -66,7 +70,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					PackManager gen_ret = new PackManager();
+					PackSystem.PackManager gen_ret = new PackSystem.PackManager();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -76,7 +80,7 @@ namespace XLua.CSObjectWrap
 			catch(System.Exception gen_e) {
 				return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
 			}
-            return LuaAPI.luaL_error(L, "invalid arguments to PackManager constructor!");
+            return LuaAPI.luaL_error(L, "invalid arguments to PackSystem.PackManager constructor!");
             
         }
         
@@ -88,6 +92,33 @@ namespace XLua.CSObjectWrap
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_Start(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    
+                    gen_to_be_invoked.Start(  );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _m_StoreItem(RealStatePtr L)
         {
 		    try {
@@ -95,7 +126,7 @@ namespace XLua.CSObjectWrap
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
             
             
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
             
             
                 
@@ -123,7 +154,7 @@ namespace XLua.CSObjectWrap
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
             
             
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
             
             
                 
@@ -151,7 +182,7 @@ namespace XLua.CSObjectWrap
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
             
             
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
             
             
                 
@@ -178,7 +209,7 @@ namespace XLua.CSObjectWrap
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
             
             
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
             
             
                 
@@ -209,7 +240,7 @@ namespace XLua.CSObjectWrap
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
             
             
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
             
             
                 
@@ -217,6 +248,33 @@ namespace XLua.CSObjectWrap
                     string _localPath = LuaAPI.lua_tostring(L, 2);
                     
                     gen_to_be_invoked.LoadLuaScript( _localPath );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_OnDisable(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    
+                    gen_to_be_invoked.OnDisable(  );
                     
                     
                     
@@ -237,7 +295,21 @@ namespace XLua.CSObjectWrap
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			    translator.Push(L, PackManager.Instance);
+			    translator.Push(L, PackSystem.PackManager.Instance);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_injections(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked.injections);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -250,7 +322,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 translator.Push(L, gen_to_be_invoked.tooltip);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -264,7 +336,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 translator.Push(L, gen_to_be_invoked.DragItem);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -278,7 +350,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 translator.Push(L, gen_to_be_invoked.ThePack);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -292,7 +364,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 translator.Push(L, gen_to_be_invoked.AddItem);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -306,7 +378,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 translator.Push(L, gen_to_be_invoked.luaScriptFile);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -317,13 +389,28 @@ namespace XLua.CSObjectWrap
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_injections(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.injections = (PackSystem.PackManager.Injection[])translator.GetObject(L, 2, typeof(PackSystem.PackManager.Injection[]));
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _s_set_tooltip(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
-                gen_to_be_invoked.tooltip = (Tooltip)translator.GetObject(L, 2, typeof(Tooltip));
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.tooltip = (PackSystem.Tooltip)translator.GetObject(L, 2, typeof(PackSystem.Tooltip));
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -337,8 +424,8 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
-                gen_to_be_invoked.DragItem = (DragUI)translator.GetObject(L, 2, typeof(DragUI));
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.DragItem = (PackSystem.DragUI)translator.GetObject(L, 2, typeof(PackSystem.DragUI));
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -352,8 +439,8 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
-                gen_to_be_invoked.ThePack = (PackPanel)translator.GetObject(L, 2, typeof(PackPanel));
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.ThePack = (PackSystem.PackPanel)translator.GetObject(L, 2, typeof(PackSystem.PackPanel));
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
@@ -367,7 +454,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 gen_to_be_invoked.AddItem = (UnityEngine.UI.Button)translator.GetObject(L, 2, typeof(UnityEngine.UI.Button));
             
             } catch(System.Exception gen_e) {
@@ -382,7 +469,7 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			
-                PackManager gen_to_be_invoked = (PackManager)translator.FastGetCSObj(L, 1);
+                PackSystem.PackManager gen_to_be_invoked = (PackSystem.PackManager)translator.FastGetCSObj(L, 1);
                 gen_to_be_invoked.luaScriptFile = (UnityEngine.TextAsset)translator.GetObject(L, 2, typeof(UnityEngine.TextAsset));
             
             } catch(System.Exception gen_e) {
