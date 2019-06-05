@@ -187,6 +187,7 @@ public class PackManager : MonoBehaviour{
             try
             {
                 StreamWriter sw;
+                print(Application.persistentDataPath);
                 //如果不存在则创建一个lua脚本文件
                 if (!File.Exists(Application.persistentDataPath + @"\" + localPath))
                 {
