@@ -12,12 +12,12 @@
 否则报错：invalid userdata for UnityEngine.Vector2
 
 # 关于泛型函数的调用方法
-在xLua的github的FAQ中有提到，可以使用反射来条用泛型方法；eg：
-
+在xLua的github的FAQ中有提到，可以使用反射来条用泛型方法；
+eg：
 ``` lua
 -- 通过反射获取泛型方法
 local loadGeneric = xlua.get_generic_method(CS.UnityEngine.Resources, "Load");
 local load = loadGeneric(CS.UnityEngine.Sprite)
 --调用获取的泛型方法
-local sprite = load(item.Icon)
+local sprite = load("path/...")
 ```
