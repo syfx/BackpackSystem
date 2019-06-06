@@ -9,6 +9,9 @@ local btnAddItem = nil
 --当前使用的画布
 local canvas
 
+--储存装备实体的类
+local ItemModel
+
 --是否正在显示Tooltip
 local IsShowTooltip = false
 --是否正在拖拽装备
@@ -16,6 +19,7 @@ local IsDrag = false
 
 function start()
 	print("lua start...")
+	ItemModel = CS.PackSystem.ItemModel
 
 	tooltip = objTooltip:GetComponent(typeof(CS.PackSystem.Tooltip))
 	dragItem = objDragUI:GetComponent(typeof(CS.PackSystem.DragUI))
@@ -23,11 +27,15 @@ function start()
 	btnAddItem = objAddItem:GetComponent(typeof(CS.UnityEngine.UI.Button))
 	canvas = CS.UnityEngine.GameObject.Find("Canvas")
 	--注册鼠标进入格子事件
-	CS.PackSystem.GridUI.OnEnter = GridUI_OnEnter
+	local GridUI = CS.PackSystem.GridUI
+	GridUI.OnEnter = GridUI_OnEnter
+	GridUI.OnExit = GridUI_OnExit
+	GridUI.OnLeftBeginDrag = GridUI_OnLeftBeginDrag
+	GridUI.OnLeftEndDrag =  GridUI_OnLeftEndDrag
 end
 
 function update()
-	position = CS.PackSystem.MyRectTransformUtility.ScreenPointToLocalPoint(canvas.transform, CS.UnityEngine.Input.mousePosition, nil)
+	local position = CS.PackSystem.MiddleTier.ScreenPointToLocalPoint(canvas.transform, CS.UnityEngine.Input.mousePosition, nil)
 	if (IsDrag)
 	then
 		--显示拖拽UI
@@ -41,17 +49,94 @@ function update()
 	end
 end
 
---鼠标进入格子回调方法
+--鼠标进入格子回调函数
 function GridUI_OnEnter(transform)
 	print("GridUI_OnEnter...")
-	local item = CS.PackSystem.ItemModel.GetData(transform.name)
+	local item = ItemModel.GetData(transform.name)
     if (item	~= nil)
 	then
-		print("执行成功！")
-		local text = GetToolTipText(item)
-		tooltip:UpdateToolTip(text)
+		tooltip:UpdateToolTip(GetToolTipText(item))
 		IsShowTooltip = true
 	end
+end
+
+--鼠标离开格子回调函数
+function GridUI_OnExit()
+	IsShowTooltip = false
+	tooltip:HideToolTip()
+end
+
+
+--鼠标开始拖拽装备回调函数
+function GridUI_OnLeftBeginDrag(transform)
+    if (transform.childCount ~= 0)
+	then
+		local item = ItemModel.GetData(transform.name)
+		-- 通过反射获取泛型方法
+		local loadGeneric = xlua.get_generic_method(CS.UnityEngine.Resources, "Load")
+		local load = loadGeneric(CS.UnityEngine.Sprite)
+		--调用获取的泛型方法
+		local sprite = load(item.Icon)
+
+		dragItem:Set_Item(sprite)
+		CS.UnityEngine.Object.Destroy(transform:GetChild(0).gameObject)
+		IsDrag = true
+	end
+end
+
+-- 鼠标结束拖拽装备回调函数
+-- arg1: 装备原格子的transform
+-- arg2：停止拖拽时时格子的transform
+function GridUI_OnLeftEndDrag(arg1, arg2)
+    --扔装备
+    if (arg2 == nil)
+	then
+        ItemModel.RemoveDate(arg1.name)
+    else
+        item = ItemModel.GetData(arg1.name)						-- 得到装备数据
+        ItemModel.RemoveDate(arg1.name)							-- 删除装备数据
+        if (arg2.tag == "Grid")				-- 拖到装备格上
+        then
+            if (arg2.childCount == 0)				-- 拖到的格子上没装备
+			then
+                CreateItem(item, arg2)
+            else													-- 拖到的格子上有装备
+                _item = ItemModel.GetData(arg2.name)			-- 得到原有装备数据
+                ItemModel.RemoveDate(arg2.name)					-- 删除原有装备数据
+				-- 删除原有孩子（原有装备图标实例）
+                CS.UnityEngine.Object.Destroy(arg2:GetChild(0).gameObject)
+                --交换
+                CreateItem(item, arg2)
+                CreateItem(_item, arg1)
+            end
+        else											-- 未拖到装备格上，再放回去
+            CreateItem(item, arg1)
+		end
+    end
+    IsDrag = false
+    dragItem:HideDrag()
+end
+
+-- 创建装备
+-- item（Item）：装备类
+-- ParentTF（Transform）：父变换
+function CreateItem(item, ParentTF)
+	local loadGeneric = xlua.get_generic_method(CS.UnityEngine.Resources, "Load")
+	local load = loadGeneric(CS.UnityEngine.GameObject)
+	print("预制")
+    ItemPrefab = load("Prefabs/ItemUI")
+	-- 实例化游戏物体
+    newItem = CS.UnityEngine.GameObject.Instantiate(ItemPrefab)
+	load =  loadGeneric(CS.UnityEngine.Sprite)
+    sprite = load(item.Icon)
+	--设置图标
+    newItem:GetComponent(typeof(CS.PackSystem.ItemUI)):Set_Item(sprite)
+
+    newItem.transform:SetParent(ParentTF);
+    newItem.transform.localPosition = CS.UnityEngine.Vector3.zero;
+    newItem.transform.localScale = CS.UnityEngine.Vector3.one;
+
+    ItemModel.StoreData(ParentTF.name, item);
 end
 
 -- 获取装备的提示信息 (item: Item类型变量)
@@ -107,3 +192,5 @@ function GetToolTipText(item)
 	
     return strDescribe:ToString()
 end
+
+

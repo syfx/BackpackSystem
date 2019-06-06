@@ -10,8 +10,11 @@ using System;
 
 namespace PackSystem
 {
+    /// <summary>
+    /// 中转站，在lua中不能直接调用的方法，通过这个类中的方法封装后进行访问
+    /// </summary>
     [LuaCallCSharp]
-    public class MyRectTransformUtility
+    public class MiddleTier
     {
         /// <summary>
         /// 屏幕坐标转UI坐标
@@ -108,7 +111,7 @@ namespace PackSystem
 
             Load("PackManager.lua", "luasprite.v1");
             // GridUI.OnEnter += GridUI_OnEnter;
-            //GridUI.OnExit += GridUI_OnExit;
+            GridUI.OnExit += GridUI_OnExit;
            // GridUI.OnLeftBeginDrag += GridUI_OnLeftBeginDrag;
             //GridUI.OnLeftEndDrag += GridUI_OnLeftEndDrag;
             AddItem.onClick.AddListener(() => StoreItem(UnityEngine.Random.Range(0, 11)));
@@ -281,6 +284,7 @@ namespace PackSystem
         }
 
 
+
         #region 事件回调
         private void GridUI_OnEnter(Transform obj)
         {
@@ -393,8 +397,7 @@ namespace PackSystem
         {
             GameObject NewItem = Resources.Load<GameObject>("Prefabs/ItemUI");
             GameObject TheItemObgect = GameObject.Instantiate(NewItem) as GameObject;
-
-            Sprite TheSprite = Resources.Load<Sprite>(item.Icon) as Sprite;
+            Sprite TheSprite = Resources.Load<Sprite>(item.Icon);
             TheItemObgect.GetComponent<ItemUI>().Set_Item(TheSprite);     //设置图标
 
             TheItemObgect.transform.SetParent(ParentTF);

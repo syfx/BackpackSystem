@@ -15,12 +15,12 @@ using System.Collections.Generic;
 namespace XLua.CSObjectWrap
 {
     using Utils = XLua.Utils;
-    public class PackSystemMyRectTransformUtilityWrap 
+    public class PackSystemMiddleTierWrap 
     {
         public static void __Register(RealStatePtr L)
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			System.Type type = typeof(PackSystem.MyRectTransformUtility);
+			System.Type type = typeof(PackSystem.MiddleTier);
 			Utils.BeginObjectRegister(type, L, translator, 0, 0, 0, 0);
 			
 			
@@ -51,7 +51,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					PackSystem.MyRectTransformUtility gen_ret = new PackSystem.MyRectTransformUtility();
+					PackSystem.MiddleTier gen_ret = new PackSystem.MiddleTier();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -61,7 +61,7 @@ namespace XLua.CSObjectWrap
 			catch(System.Exception gen_e) {
 				return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
 			}
-            return LuaAPI.luaL_error(L, "invalid arguments to PackSystem.MyRectTransformUtility constructor!");
+            return LuaAPI.luaL_error(L, "invalid arguments to PackSystem.MiddleTier constructor!");
             
         }
         
@@ -87,7 +87,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Vector3 _screenPos;translator.Get(L, 2, out _screenPos);
                     UnityEngine.Camera _cam = (UnityEngine.Camera)translator.GetObject(L, 3, typeof(UnityEngine.Camera));
                     
-                        UnityEngine.Vector2 gen_ret = PackSystem.MyRectTransformUtility.ScreenPointToLocalPoint( _rect, _screenPos, _cam );
+                        UnityEngine.Vector2 gen_ret = PackSystem.MiddleTier.ScreenPointToLocalPoint( _rect, _screenPos, _cam );
                         translator.PushUnityEngineVector2(L, gen_ret);
                     
                     

@@ -22,7 +22,7 @@ namespace XLua.CSObjectWrap
         static void wrapInit0(LuaEnv luaenv, ObjectTranslator translator)
         {
         
-            translator.DelayWrapLoader(typeof(PackSystem.MyRectTransformUtility), PackSystemMyRectTransformUtilityWrap.__Register);
+            translator.DelayWrapLoader(typeof(PackSystem.MiddleTier), PackSystemMiddleTierWrap.__Register);
         
         
             translator.DelayWrapLoader(typeof(PackSystem.PackManager), PackSystemPackManagerWrap.__Register);

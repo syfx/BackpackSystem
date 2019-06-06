@@ -3,7 +3,7 @@
 <linker>
 
 	<assembly fullname="Assembly-CSharp">
-	    <type fullname="PackSystem.MyRectTransformUtility" preserve="all"/>
+	    <type fullname="PackSystem.MiddleTier" preserve="all"/>
 		<type fullname="PackSystem.PackManager" preserve="all"/>
 		<type fullname="PackSystem.Item" preserve="all"/>
 		<type fullname="PackSystem.ItemModel" preserve="all"/>
