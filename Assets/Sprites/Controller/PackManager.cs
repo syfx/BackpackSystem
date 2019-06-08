@@ -4,32 +4,11 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using XLua;
 using System.IO;
 using System;
 
 namespace PackSystem
 {
-    /// <summary>
-    /// 中转站，在lua中不能直接调用的方法，通过这个类中的方法封装后进行访问
-    /// </summary>
-    [LuaCallCSharp]
-    public class MiddleTier
-    {
-        /// <summary>
-        /// 屏幕坐标转UI坐标
-        /// </summary>
-        /// <returns></returns>
-        public static Vector2 ScreenPointToLocalPoint(Transform rect, Vector3 screenPos, Camera cam)
-        {
-            Vector2 position;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                rect as RectTransform, screenPos, null, out position);
-           return position;
-        }
-    }
-
-    [LuaCallCSharp]
     public class PackManager : MonoBehaviour
     {
         private static PackManager _Instance;
@@ -39,17 +18,6 @@ namespace PackSystem
         //装备信息
         private Dictionary<int, Item> ItemList = new Dictionary<int, Item>();
 
-        /// <summary>
-        /// 用来储存当前脚本需要访问的其他游戏物体
-        /// </summary>
-        [System.Serializable]
-        public class Injection
-        {
-            public string name;
-            public GameObject value;
-        }
-       public Injection[] injections;
-
         [Tooltip("信息提示框")]
         public Tooltip tooltip;
         [Tooltip("拖拽时临时储存装备的格子")]
@@ -58,79 +26,20 @@ namespace PackSystem
         public PackPanel ThePack;
         [Tooltip("添加装备按钮")]
         public Button AddItem;
-        [Tooltip("Lua脚本文件")]
-        public TextAsset luaScriptFile;
-
-        private LuaEnv luaEnv;
-        /// <summary>
-        /// 当前脚本的lua环境
-        /// </summary>
-        private LuaTable scriptEnv;
-        private string luaText = string.Empty;
-
-        private Action start;
-        private Action update;
 
         private void Awake()
         {
             _Instance = this;
-            //lua虚拟机
-            luaEnv = new LuaEnv();
-            scriptEnv = luaEnv.NewTable();
-            LuaTable metaTable = luaEnv.NewTable();
-
-            //将lua全局环境当做表metaTable的元方法
-            metaTable.Set("__index", luaEnv.Global);
-            //将表metaTable设为scriptEnv的元表
-            scriptEnv.SetMetaTable(metaTable);
-            scriptEnv.Set("self", this);
-
-            foreach(Injection obj in injections)
-            {
-                scriptEnv.Set(obj.name, obj.value);
-            }
-
-            if (luaText != string.Empty)
-            {
-                //执行上次热更后的版本
-                luaEnv.DoString(luaText, "PackManager.Lua", scriptEnv);
-            }
-            else
-            {
-                //执行打包时的Lua脚本
-                luaEnv.DoString(luaScriptFile.text, "PackManager.Lua", scriptEnv);
-            }
-
-            //将Lua中的start方法映射到当前start中
-            start = scriptEnv.Get<Action>("start");
-            //将Lua中的start方法映射到当前start中
-            scriptEnv.Get("update", out update);
-
-
-
-
-            Load("PackManager.lua", "luasprite.v1");
-            // GridUI.OnEnter += GridUI_OnEnter;
-            GridUI.OnExit += GridUI_OnExit;
-           // GridUI.OnLeftBeginDrag += GridUI_OnLeftBeginDrag;
-            //GridUI.OnLeftEndDrag += GridUI_OnLeftEndDrag;
+            LoadItemData();
+            GridUI.OnEnter = GridUI_OnEnter;
+            GridUI.OnExit = GridUI_OnExit;
+            GridUI.OnLeftBeginDrag = GridUI_OnLeftBeginDrag;
+            GridUI.OnLeftEndDrag = GridUI_OnLeftEndDrag;
             AddItem.onClick.AddListener(() => StoreItem(UnityEngine.Random.Range(0, 11)));
-        }
-
-        public void Start()
-        {
-            if (start != null)
-            {
-                start();
-            }
         }
 
         private void Update()
         {
-            if (update != null)
-            {
-                update();
-            }
             Vector2 position;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 GameObject.Find("Canvas").transform as RectTransform,
@@ -163,25 +72,6 @@ namespace PackSystem
             Item TheItem = ItemList[ItemID];
             Transform Grid = ThePack.GetNullGrid();//得到一个空装备格
             CreateItem(TheItem, Grid);
-        }
-
-        /// <summary>
-        /// 移除装备
-        /// </summary>
-        public void RemoveItem(int ItemID)
-        {
-            ItemModel.RemoveDate(ItemList[ItemID].Name);
-        }
-
-        /// <summary>
-        /// 数据加载
-        /// </summary>
-        private void Load(string resName, string resPath)
-        {
-            //从服务器加载PackManager.lua脚本
-            //StartCoroutine(UpdateLuaScript(resName, resPath, "luaText.txt"));
-            //LoadLuaScript("luaText.txt");
-            LoadItemData();
         }
 
         /// <summary>
@@ -223,67 +113,6 @@ namespace PackSystem
             ItemList.Add(c1.ID, c1);
             ItemList.Add(c2.ID, c2);
         }
-
-        /// <summary>
-        /// 从服务器获取Lua脚本并更新本地Lua脚本
-        /// </summary>
-        public IEnumerator UpdateLuaScript(string resName, string resPath, string localPath)
-        {
-            UnityWebRequest request = UnityWebRequest.GetAssetBundle("https://github.com/syfx/BackpackSystem/raw/master/AssetBundles/LuaScripts/" + resPath);
-            yield return request.SendWebRequest();
-            AssetBundle ab = (request.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
-            if (ab != null)
-            {
-                luaScriptFile = ab.LoadAsset<TextAsset>(resName);
-            }
-            if (luaScriptFile != null)
-            {
-                Debug.Log("更新后重启程序");
-                try
-                {
-                    StreamWriter sw;
-                    //如果不存在则创建一个lua脚本文件
-                    if (!File.Exists(Application.persistentDataPath + @"\" + localPath))
-                    {
-                        sw = File.CreateText(Application.persistentDataPath + @"\" + localPath);
-                    }
-                    else
-                    {
-                        //清空之前内容
-                        sw = new StreamWriter(Application.persistentDataPath + @"\" + localPath, false);
-                    }
-                    //写入内容
-                    sw.WriteLine(luaScriptFile.text);
-                    //关闭并销毁流
-                    sw.Close();
-                    sw.Dispose();
-                }
-                catch (System.Exception e)
-                {
-                    Debug.Log(e.Message);
-                }
-            }
-        }
-        /// <summary>
-        /// 从本地加载lua脚本
-        /// </summary>
-        /// <param name="resName">文件在Application.persistentDataPath下的路径，不包括扩展名</param>
-        public void LoadLuaScript(string localPath)
-        {
-            try
-            {
-                if (File.Exists(Application.persistentDataPath + @"\" + localPath))
-                {
-                    luaText = File.ReadAllText(Application.persistentDataPath + @"\" + localPath);
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.Log(e.Message);
-            }
-        }
-
-
 
         #region 事件回调
         private void GridUI_OnEnter(Transform obj)
@@ -333,12 +162,12 @@ namespace PackSystem
                         Item _item = ItemModel.GetData(arg2.name);      //得到原有装备数据
                         ItemModel.RemoveDate(arg2.name);                    //删除原有装备数据
                         Destroy(arg2.GetChild(0).gameObject);                 //删除原有孩子
-                                                                              //交换
+                         //交换
                         CreateItem(item, arg2);
                         CreateItem(_item, arg1);
                     }
                 }
-                else//未拖到装备格上，再放回去
+                else                                   //未拖到装备格上，再放回去
                     CreateItem(item, arg1);
             }
             IsDrag = false;

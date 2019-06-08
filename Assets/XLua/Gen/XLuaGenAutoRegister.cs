@@ -25,7 +25,7 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(PackSystem.MiddleTier), PackSystemMiddleTierWrap.__Register);
         
         
-            translator.DelayWrapLoader(typeof(PackSystem.PackManager), PackSystemPackManagerWrap.__Register);
+            translator.DelayWrapLoader(typeof(PackSystem.LuaCallCs), PackSystemLuaCallCsWrap.__Register);
         
         
             translator.DelayWrapLoader(typeof(PackSystem.Item), PackSystemItemWrap.__Register);
@@ -38,6 +38,9 @@ namespace XLua.CSObjectWrap
         
         
             translator.DelayWrapLoader(typeof(PackSystem.GridUI), PackSystemGridUIWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(PackSystem.ItemUI), PackSystemItemUIWrap.__Register);
         
         
             translator.DelayWrapLoader(typeof(PackSystem.PackPanel), PackSystemPackPanelWrap.__Register);

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using XLua;
 
 namespace PackSystem
 {
+    [LuaCallCSharp]
     public class ItemUI : MonoBehaviour
     {
-
         public Image TheImage;
 
         /// <summary>

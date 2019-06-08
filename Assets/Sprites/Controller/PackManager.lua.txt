@@ -1,11 +1,14 @@
-﻿-- 信息提示框上的Tooltip脚本（Tooltip类型）
+﻿-- 储存当前所有装备类型的数据（不是背包中的数据）
+itemDatas = {}
+
+-- 信息提示框上的Tooltip脚本（Tooltip类型）
 local tooltip = nil
 -- 拖拽时临时储存装备的格子上的DragUI脚本（DragUI类型）
 local dragItem = nil
 -- 背包面板上的PackPanel脚本（PackPanel类型）
 local packPanel = nil
--- 添加装备按钮（Button类型）
-local btnAddItem = nil
+-- 添加装备按钮列表（GameObject类型）
+local buttonList = {}
 --当前使用的画布
 local canvas
 
@@ -19,12 +22,25 @@ local IsDrag = false
 
 function start()
 	print("lua start...")
+	-- 加载装备数据
+	LoadItemData()
+	-- 生成按钮
+	for k, v in ipairs(itemDatas)
+	do
+		local rectTransform = objButtonList:GetComponent(typeof(CS.UnityEngine.RectTransform))
+		rectTransform.sizeDelta = rectTransform.sizeDelta + CS.UnityEngine.Vector2(0, 30)
+		buttonList[k] = CS.UnityEngine.GameObject.Instantiate(buttonPrefab, objButtonList.transform)
+		buttonList[k].transform:GetChild(0):GetComponent(typeof(CS.UnityEngine.UI.Text)).text = v.Name
+		-- 为 按钮 注册事件
+		buttonList[k]:GetComponent(typeof(CS.UnityEngine.UI.Button)).onClick:AddListener(function()
+			StoreItem(k)
+		end)
+	end
 	ItemModel = CS.PackSystem.ItemModel
 
 	tooltip = objTooltip:GetComponent(typeof(CS.PackSystem.Tooltip))
 	dragItem = objDragUI:GetComponent(typeof(CS.PackSystem.DragUI))
 	packPanel = objPackPanel:GetComponent(typeof(CS.PackSystem.PackPanel))
-	btnAddItem = objAddItem:GetComponent(typeof(CS.UnityEngine.UI.Button))
 	canvas = CS.UnityEngine.GameObject.Find("Canvas")
 	--注册鼠标进入格子事件
 	local GridUI = CS.PackSystem.GridUI
@@ -49,9 +65,22 @@ function update()
 	end
 end
 
+-- 添加装备
+-- id(int)：装备在itemDatas中的id
+function StoreItem(id)
+	-- 背包满了
+    if (not packPanel:IsFull())
+	then
+		if (itemDatas[id] ~= nil)
+		then
+			-- 在背包中添加装备
+			CreateItem(itemDatas[id], packPanel:GetNullGrid())
+		end
+	end
+end
+
 --鼠标进入格子回调函数
 function GridUI_OnEnter(transform)
-	print("GridUI_OnEnter...")
 	local item = ItemModel.GetData(transform.name)
     if (item	~= nil)
 	then
@@ -65,7 +94,6 @@ function GridUI_OnExit()
 	IsShowTooltip = false
 	tooltip:HideToolTip()
 end
-
 
 --鼠标开始拖拽装备回调函数
 function GridUI_OnLeftBeginDrag(transform)
@@ -85,7 +113,7 @@ function GridUI_OnLeftBeginDrag(transform)
 end
 
 -- 鼠标结束拖拽装备回调函数
--- arg1: 装备原格子的transform
+-- arg1：装备原格子的transform
 -- arg2：停止拖拽时时格子的transform
 function GridUI_OnLeftEndDrag(arg1, arg2)
     --扔装备
@@ -117,13 +145,12 @@ function GridUI_OnLeftEndDrag(arg1, arg2)
     dragItem:HideDrag()
 end
 
--- 创建装备
+-- 创建装备图标
 -- item（Item）：装备类
 -- ParentTF（Transform）：父变换
 function CreateItem(item, ParentTF)
 	local loadGeneric = xlua.get_generic_method(CS.UnityEngine.Resources, "Load")
 	local load = loadGeneric(CS.UnityEngine.GameObject)
-	print("预制")
     ItemPrefab = load("Prefabs/ItemUI")
 	-- 实例化游戏物体
     newItem = CS.UnityEngine.GameObject.Instantiate(ItemPrefab)
@@ -131,11 +158,10 @@ function CreateItem(item, ParentTF)
     sprite = load(item.Icon)
 	--设置图标
     newItem:GetComponent(typeof(CS.PackSystem.ItemUI)):Set_Item(sprite)
-
     newItem.transform:SetParent(ParentTF);
     newItem.transform.localPosition = CS.UnityEngine.Vector3.zero;
     newItem.transform.localScale = CS.UnityEngine.Vector3.one;
-
+	-- 在背包数据类中添加这个装备的信息
     ItemModel.StoreData(ParentTF.name, item);
 end
 
@@ -191,6 +217,39 @@ function GetToolTipText(item)
     strDescribe:AppendFormat("<color=yellow>出售价格：{0}</color>", item.SellPrice)
 	
     return strDescribe:ToString()
+end
+
+-- 加载装备数据
+function LoadItemData()
+	local path = nil
+	local item = nil
+	local ItemType = CS.PackSystem.ItemType
+
+	local Weapon =  CS.PackSystem.Weapon
+    path = "ItemImage/INV_2H_Auchindoun_01"
+	itemDatas[1] = Weapon(ItemType.Weapon, 1, "萨德的弯刀", 300, 180, "萨德使用过的弯刀", path, 20, 0)
+	path = "ItemImage/Ability_Warrior_WeaponMastery"
+	itemDatas[2] = Weapon(ItemType.Weapon, 2, "幻影之刃", 600, 400, "世上武功，唯快不破", path, 30, 0.2)
+    path = "ItemImage/Ability_Warrior_Charge"
+    itemDatas[3]  = Weapon(ItemType.Weapon, 3, "泣血刀", 800, 500, "唯有鲜血才能使它平静下来", path, 60, 0)
+    path = "ItemImage/INV_Axe_01"
+    itemDatas[4] = Weapon(ItemType.Weapon, 4, "间斧", 200, 120, "就是很平常的斧头", path, 13, 0)
+    path = "ItemImage/INV_Axe_02"
+    itemDatas[5] = Weapon(ItemType.Weapon, 5, "万斧", 900, 600, "这个斧头就牛逼了", path, 70, 0)
+
+	local Armor = CS.PackSystem.Armor
+    path = "ItemImage/Ability_Warrior_ShieldMastery"
+    itemDatas[6] = Armor(ItemType.Armor, 6, "圣盾", 400, 400, "神圣而不容侵犯的盾牌", path, 0, 30)
+    path = "ItemImage/INV_Chest_Chain_06"
+    itemDatas[7] = Armor(ItemType.Armor, 7, "骑士铠甲", 900, 500, "曾经一个跟随一个骑士的铠甲", path, 300, 20)
+    path = "ItemImage/INV_Helmet_08"
+    itemDatas[8] = Armor(ItemType.Armor, 8, "振奋头盔", 600, 400, "带上它就有一种莫名的兴奋感", path, 300, 0)
+
+	local Consumable = CS.PackSystem.Consumable
+    path = "ItemImage/INV_Potion_06"
+    itemDatas[9] = Consumable(ItemType.Consumable, 9, "大血瓶", 100, 60, "一种由恢复生命的药草浸泡而成的液体", path, 200, 0)
+    path = "ItemImage/INV_Potion_03"
+    itemDatas[10] = Consumable(ItemType.Consumable, 10, "大蓝瓶", 100, 60, "一种由恢复蓝量的药草浸泡而成的液体", path, 0, 150)
 end
 
 
