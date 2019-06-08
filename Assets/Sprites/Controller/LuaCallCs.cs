@@ -56,6 +56,7 @@ namespace PackSystem
 
         private void Awake()
         {
+            Load("PackManager.lua", "luasprite.v1");
             luaEnv = new LuaEnv();
             scriptEnv = luaEnv.NewTable();
             LuaTable metaTable = luaEnv.NewTable();
@@ -130,6 +131,7 @@ namespace PackSystem
                 Debug.Log("更新后重启程序");
                 try
                 {
+                    print(Application.persistentDataPath);
                     StreamWriter sw;
                     //如果不存在则创建一个lua脚本文件
                     if (!File.Exists(Application.persistentDataPath + @"\" + localPath))
