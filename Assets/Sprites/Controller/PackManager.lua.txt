@@ -116,6 +116,11 @@ end
 -- arg1：装备原格子的transform
 -- arg2：停止拖拽时时格子的transform
 function GridUI_OnLeftEndDrag(arg1, arg2)
+	-- 没有拖拽装备
+	if(IsDrag == false)
+	then
+		return
+	end
     --扔装备
     if (arg2 == nil)
 	then
